@@ -12,3 +12,4 @@ variable "volume_size" {
     default = 15
     type = number
 }
+

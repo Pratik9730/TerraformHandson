@@ -1,7 +1,7 @@
 #Key_pair
 resource "aws_key_pair" "ec2_key" {
     key_name = "ec2_key"
-    public_key = file("C:/Users/pratik.yangandalwar/Terraform_Projects/Variable and output block/key_pair/ec2_key.pub")
+    public_key = file("path_to/ec2_key.pub")
   
 }
 
@@ -47,13 +47,18 @@ resource "aws_security_group" "aws_security_group" {
 
 #Ec2 instance
 resource "aws_instance" "trial1" {
-    count = 3
+    for_each = tomap(
+      {
+        instance-1 = "t3.micro"
+        instance-2 = "t3.medium"
+      }
+    )
     key_name = aws_key_pair.ec2_key.key_name
      vpc_security_group_ids = [
     aws_security_group.aws_security_group.id
   ]
     ami = var.ami_id
-    instance_type = var.instance_type
+    instance_type = each.value
 
     root_block_device {
       volume_type = "gp3"
@@ -61,8 +66,6 @@ resource "aws_instance" "trial1" {
     }
 
     tags = {
-
-      "with" = "terraform"
-      Name = "app-${count.index}"
+      Name = each.key
     }
 }
